@@ -70,6 +70,13 @@ WORKDIR /
 RUN ln -s /var/www/pydio-core/data pydio-data
 
 # ------------------------------------------------------------------------------
+# Set locale
+RUN locale-gen ru_RU.UTF-8 && \
+    export LANG="ru_RU.utf8" && \
+    export LC_ALL="ru_RU.utf8" && \
+    sed -i -e "s/\/\/define(\"AJXP_LOCALE\",\s*\"en_EN.UTF-8\");/define(\"AJXP_LOCALE\", \"ru_RU.UTF-8\");/g" /var/www/pydio-core/conf/bootstrap_conf.php
+
+# ------------------------------------------------------------------------------
 # Expose ports.
 EXPOSE 80
 EXPOSE 443
