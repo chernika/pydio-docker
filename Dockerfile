@@ -66,8 +66,6 @@ RUN wget http://downloads.sourceforge.net/project/ajaxplorer/pydio/stable-channe
     chmod 777 /var/www/pydio-core/data/files/ && \
     chmod 777 /var/www/pydio-core/data/personal/
 
-ADD plugins/access.sftp_psl /var/www/pydio-core/plugins/access.sftp_psl
-
 WORKDIR /
 RUN ln -s /var/www/pydio-core/data pydio-data
 
