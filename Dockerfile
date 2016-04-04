@@ -1,26 +1,29 @@
 # ------------------------------------------------------------------------------
-# Based on a work at https://github.com/docker/docker.
+# Based on a work at https://github.com/kdelfour/pydio-docker.
 # ------------------------------------------------------------------------------
 # Pull base image.
 FROM kdelfour/supervisor-docker
-MAINTAINER Kevin Delfour <kevin@delfour.eu>
+MAINTAINER Chernika Team <a.artamonov@chernika.info>
 
 # ------------------------------------------------------------------------------
 # Install Base
-RUN apt-get update
-RUN apt-get install -yq wget unzip nginx fontconfig-config fonts-dejavu-core \
+RUN apt-get update && \
+    apt-get install -yq wget unzip nginx fontconfig-config fonts-dejavu-core \
     php5-fpm php5-common php5-json php5-cli php5-common php5-mysql\
     php5-gd php5-json php5-mcrypt php5-readline psmisc ssl-cert \
-    ufw php-pear libgd-tools libmcrypt-dev mcrypt mysql-server mysql-client
+    ufw php-pear libgd-tools libmcrypt-dev mcrypt mysql-server mysql-client \
+    curl libcurl3 libcurl3-dev php5-curl && \
+    apt-get autoremove -y && apt-get clean
 
 # ------------------------------------------------------------------------------
 # Configure mysql
 RUN sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/my.cnf
-RUN service mysql start && \
-    mysql -uroot -e "CREATE DATABASE IF NOT EXISTS pydio;" && \
-    mysql -uroot -e "CREATE USER 'pydio'@'localhost' IDENTIFIED BY 'pydio';" && \
-    mysql -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'pydio'@'localhost' WITH GRANT OPTION;" && \
-    mysql -uroot -e "FLUSH PRIVILEGES;"
+RUN sed -i -e "s/user\s*=\s*mysql/user = root/g" /etc/mysql/my.cnf
+#RUN service mysql start && \
+#    mysql -uroot -e "CREATE DATABASE IF NOT EXISTS pydio;" && \
+#    mysql -uroot -e "CREATE USER 'pydio'@'localhost' IDENTIFIED BY 'pydio';" && \
+#    mysql -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'pydio'@'localhost' WITH GRANT OPTION;" && \
+#    mysql -uroot -e "FLUSH PRIVILEGES;"
     
 # ------------------------------------------------------------------------------
 # Configure php-fpm
@@ -51,31 +54,31 @@ RUN update-rc.d mysql defaults
 
 # ------------------------------------------------------------------------------
 # Install Pydio
-ENV PYDIO_VERSION 6.2.0
+ENV PYDIO_VERSION 6.4.0
 WORKDIR /var/www
-RUN wget http://downloads.sourceforge.net/project/ajaxplorer/pydio/stable-channel/${PYDIO_VERSION}/pydio-core-${PYDIO_VERSION}.zip
-RUN unzip pydio-core-${PYDIO_VERSION}.zip
-RUN mv pydio-core-${PYDIO_VERSION} pydio-core
-RUN chown -R www-data:www-data /var/www/pydio-core
-RUN chmod -R 770 /var/www/pydio-core
-RUN chmod 777  /var/www/pydio-core/data/files/
-RUN chmod 777  /var/www/pydio-core/data/personal/
+RUN wget http://downloads.sourceforge.net/project/ajaxplorer/pydio/stable-channel/${PYDIO_VERSION}/pydio-core-${PYDIO_VERSION}.zip && \
+    unzip pydio-core-${PYDIO_VERSION}.zip && \
+    mv pydio-core-${PYDIO_VERSION} pydio-core && \
+    rm pydio-core-${PYDIO_VERSION}.zip && \
+    chown -R www-data:www-data /var/www/pydio-core && \
+    chmod -R 770 /var/www/pydio-core && \
+    chmod 777 /var/www/pydio-core/data/files/ && \
+    chmod 777 /var/www/pydio-core/data/personal/
+
+ADD plugins/access.sftp_psl /var/www/pydio-core/plugins/access.sftp_psl
 
 WORKDIR /
-RUN ln -s /var/www/pydio-core/data pydio-data 
+RUN ln -s /var/www/pydio-core/data pydio-data
+
 # ------------------------------------------------------------------------------
 # Expose ports.
 EXPOSE 80
 EXPOSE 443
 
 # ------------------------------------------------------------------------------
-# Expose volumes
-VOLUME /pydio-data/files
-VOLUME /pydio-data/personal
-
-# ------------------------------------------------------------------------------
 # Add supervisord conf
 ADD conf/startup.conf /etc/supervisor/conf.d/
 
 # Start supervisor, define default command.
-CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
+ADD run.sh /etc/run.sh
+ENTRYPOINT ["/bin/sh", "/etc/run.sh"]

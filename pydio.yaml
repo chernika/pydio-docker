@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: pydio
+spec:
+  template:
+    metadata:
+      labels:
+        app: pydio
+    spec:
+      containers:
+      - name: pydio
+        image: chernika/pydio-s3
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 80m
+        ports:
+        - containerPort: 443
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /mount/gce-volume
+          name: pydio
+      volumes:
+        - name: pydio
+          gcePersistentDisk:
+            pdName: pydio
+            fsType: ext4
