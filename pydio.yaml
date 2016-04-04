@@ -10,7 +10,7 @@ spec:
     spec:
       containers:
       - name: pydio
-        image: chernika/pydio-s3
+        image: chernika/pydio-gce-docker
         imagePullPolicy: Always
         resources:
           limits:
