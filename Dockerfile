@@ -48,12 +48,6 @@ RUN mkdir /etc/nginx/ssl
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.crt -subj '/CN=localhost/O=My Company Name LTD./C=US'
 
 # ------------------------------------------------------------------------------
-# Configure services
-RUN update-rc.d nginx defaults
-RUN update-rc.d php5-fpm defaults
-RUN update-rc.d mysql defaults
-
-# ------------------------------------------------------------------------------
 # Install Pydio
 ENV PYDIO_VERSION 6.4.0
 WORKDIR /var/www
