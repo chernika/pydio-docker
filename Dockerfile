@@ -66,6 +66,10 @@ RUN wget http://downloads.sourceforge.net/project/ajaxplorer/pydio/stable-channe
     chmod 777 /var/www/pydio-core/data/files/ && \
     chmod 777 /var/www/pydio-core/data/personal/
 
+# ------------------------------------------------------------------------------
+# Disabling defer for webDAV compatibility with big files
+RUN sed -i -e "s/\s*public\s*static\s*function\s*applyHook(\$hookName,\s*\$args,\s*\$forceNonDefer\s*=\s*false)/public static function applyHook(\$hookName, \$args, \$forceNonDefer = true)/g" /var/www/pydio-core/core/classes/class.AJXP_Controller.php
+
 WORKDIR /
 RUN ln -s /var/www/pydio-core/data pydio-data
 
