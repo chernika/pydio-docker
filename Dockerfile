@@ -19,11 +19,11 @@ RUN apt-get update && \
 # Configure mysql
 RUN sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/my.cnf
 RUN sed -i -e "s/user\s*=\s*mysql/user = root/g" /etc/mysql/my.cnf
-#RUN service mysql start && \
-#    mysql -uroot -e "CREATE DATABASE IF NOT EXISTS pydio;" && \
-#    mysql -uroot -e "CREATE USER 'pydio'@'localhost' IDENTIFIED BY 'pydio';" && \
-#    mysql -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'pydio'@'localhost' WITH GRANT OPTION;" && \
-#    mysql -uroot -e "FLUSH PRIVILEGES;"
+RUN service mysql start && \
+    mysql -uroot -e "CREATE DATABASE IF NOT EXISTS pydio;" && \
+    mysql -uroot -e "CREATE USER 'pydio'@'localhost' IDENTIFIED BY 'pydio';" && \
+    mysql -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'pydio'@'localhost' WITH GRANT OPTION;" && \
+    mysql -uroot -e "FLUSH PRIVILEGES;"
     
 # ------------------------------------------------------------------------------
 # Configure php-fpm

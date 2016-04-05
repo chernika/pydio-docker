@@ -1,10 +1,10 @@
 #!/bin/sh
 
-rm -rf /var/www/pydio-core/data/
-rm -rf /var/lib/mysql/
-
-ln -s /mount/gce-volume/pydio /var/www/pydio-core/data
-ln -s /mount/gce-volume/mysql/ /var/lib/mysql
+# mounting Google Cloud volume
+if [ -d /mount/gce-volume ]; then
+  rm -rf /var/www/pydio-core/data && ln -s /mount/gce-volume/pydio /var/www/pydio-core/data
+  rm -rf /var/lib/mysql && ln -s /mount/gce-volume/mysql/ /var/lib/mysql
+fi
 
 # reset permissions on log volumes
 chown -R www-data:www-data /var/www/pydio-core
