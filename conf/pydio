@@ -1,7 +1,7 @@
 server {
         listen 80;
         server_name localhost;
-        rewrite ^ https://$server_name$request_uri? permanent;
+        rewrite ^ https://$host$request_uri? permanent;
 }
 
 server {
